@@ -4,7 +4,7 @@ from . import views
 urlpatterns=[
     path('',views.apiIndex,name="apiIndex"),
     path('book/list/',views.bookList,name="book-list"),
-    path('book/list/return=<int:status>',views.bookListReturn),
+    path('book/list/return=<int:status>/',views.bookListReturn),
     path('book/<int:ser>/',views.bookDetail),
     path('book/add/',views.bookCreate),
     path('book/<int:ser>/delete/',views.bookDelete),

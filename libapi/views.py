@@ -22,7 +22,8 @@ def bookList(request):
 @api_view(['GET'])
 def bookListReturn(request,status):
     books=Book.objects.all()
-    serialized=BookSerializer(books)
+    serialized=BookSerializer(books,many=True)
+    print(serialized.data)
     finalSerializer=[]
     for item in serialized.data:
         if status==True and item['bookIssued']==0:
