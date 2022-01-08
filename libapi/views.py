@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializer import BookSerializer,UserSerializer
+from django.db.models import F
 from .models import Book,User
 
 @api_view(['GET'])
@@ -14,6 +15,7 @@ def apiIndex(request):
 @api_view(['GET'])
 def bookList(request):
     books=Book.objects.all()
+    print(books)
     serialized=BookSerializer(books,many=True)
     return Response(serialized.data)
 
@@ -50,41 +52,50 @@ def userList(request):
 
 @api_view(['GET'])
 def userDetail(request,reg):
-    if User.objects.filter(regNo=reg).exists():
-        user=User.objects.get(regNo=reg)
-        serialized=UserSerializer(user,many=False)
+    user=User.objects.filter(regNo=reg,returnStatus=False)
+    if user.exists():
+        serialized=UserSerializer(user,many=True)
         return Response(serialized.data)
     else:
         return Response("User doesn't exist")
         
 
 @api_view(['POST'])
-def userCreate(request):
+def userAdd(request):
     serialized=UserSerializer(data=request.data)
-    # print(serialized)
-    # print(serialized.is_valid())
-    # if serialized.is_valid():
-    #     serialized.save()
-            
     bkNo=request.data['bookNo']
-    # return redirect("user-list")
-
-    if Book.objects.filter(serial=bkNo).exists():
+    book=Book.objects.filter(serial=bkNo)
+    if book.exists():
         if serialized.is_valid():
             serialized.save()
-            book=Book.objects.get(serial=bkNo)
-            book.no_of_borrowed+=1
-            book.save()
+            book.update(no_of_times_borrowed=F('no_of_times_borrowed')+1)
         return redirect('user-list')
     else:
         return Response("Book not found..")
 
+@api_view(['PUT'])
+def userUpdate(request,reg,ser):
+    user=User.objects.filter(regNo=reg,bookNo=ser,returnStatus=False)
+    if user.exists():
+        serialized=UserSerializer(instance=user,data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+    else:    
+        return Response("user not exists...")
     
+
+def userReturn(request,reg,ser,status):
+    book=User.objects.filter(regNo=reg,bookNo=ser,returnStatus=False)
+    if book.exists():
+        book.update(returnStatus=status)
+        return redirect("user-list")
+    else:
+        return Response("user not found!!")
 
 @api_view(['DELETE'])
 def userDelete(request,reg,ser):
-    if User.objects.filter(regNo=reg).exists():
-        book=User.objects.get(regNo=reg,bookNo=ser)
+    book=User.objects.filter(regNo=reg,bookNo=ser)
+    if book.exists():
         book.delete()
         return redirect("user-list")
     else:
