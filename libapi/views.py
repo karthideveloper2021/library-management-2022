@@ -20,6 +20,12 @@ def bookList(request):
     return Response(serialized.data)
 
 @api_view(['GET'])
+def bookListReturn(request,status):
+    books=Book.objects.filter(returnStatus=status)
+    serialized=BookSerializer(books)
+    return Response(serialized.data)
+
+@api_view(['GET'])
 def bookDetail(request,ser):
     if Book.objects.filter(serial=ser).exists():
         book=Book.objects.get(serial=ser)
@@ -41,6 +47,17 @@ def bookDelete(request,ser):
     book=Book.objects.get(serial=ser)
     book.delete()
     return redirect("book-list")
+
+@api_view(['PUT'])
+def bookUpdate(request,ser):
+    book=Book.objects.filter(serial=ser)
+    if book.exists():
+        serialized=BookSerializer(instance=book,data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+    else:
+        return Response("book doesn't exist..")
+
 
 ##~~ user api
 
