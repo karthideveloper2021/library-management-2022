@@ -21,9 +21,16 @@ def bookList(request):
 
 @api_view(['GET'])
 def bookListReturn(request,status):
-    books=Book.objects.filter(returnStatus=status)
+    books=Book.objects.all()
     serialized=BookSerializer(books)
-    return Response(serialized.data)
+    finalSerializer=[]
+    for item in serialized.data:
+        if status==True and item['bookIssued']==0:
+            finalSerializer.append(item)
+        elif status==False and item['bookIssued']!=0:
+            finalSerializer.append(item)
+        
+    return Response(finalSerializer)
 
 @api_view(['GET'])
 def bookDetail(request,ser):
