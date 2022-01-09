@@ -26,6 +26,16 @@ class BookSerializer(serializers.ModelSerializer):
             'date_of_pub','description','no_of_times_borrowed',
             'bookStock','bookIssued','bookAvailable')
 
+class BookSerializerStore(serializers.ModelSerializer):
+    class Meta:
+        model=Book
+        fields="__all__"
+
+class UserSerializerStore(serializers.ModelSerializer):
+    class Meta:
+        model=Book
+        fields="__all__"
+
 class UserSerializer(serializers.ModelSerializer):
     bookName=serializers.SerializerMethodField("_bookname")
 

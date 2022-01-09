@@ -1,8 +1,9 @@
-from django.shortcuts import redirect
+from django.db.models.base import Model
+from django.shortcuts import get_object_or_404, redirect,Http404
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializer import BookSerializer,UserSerializer
+from .serializer import BookSerializer, BookSerializerStore,UserSerializer, UserSerializerStore
 from django.db.models import F
 from .models import Book,User
 
@@ -45,7 +46,7 @@ def bookDetail(request,ser):
 
 @api_view(['POST'])
 def bookCreate(request):
-    serialized=BookSerializer(data=request.data)
+    serialized=BookSerializerStore(data=request.data)
     if serialized.is_valid():
         serialized.save()
     return redirect('book-list')
@@ -58,13 +59,12 @@ def bookDelete(request,ser):
 
 @api_view(['PUT'])
 def bookUpdate(request,ser):
-    book=Book.objects.filter(serial=ser)
-    if book.exists():
-        serialized=BookSerializer(instance=book,data=request.data)
-        if serialized.is_valid():
-            serialized.save()
-    else:
-        return Response("book doesn't exist..")
+    book=get_object_or_404(klass=Book,serial=ser)
+    serialized=BookSerializerStore(instance=book,data=request.data)
+    if serialized.is_valid():
+        serialized.save()
+    return redirect("book-list")
+    
 
 
 ##~~ user api
@@ -87,7 +87,7 @@ def userDetail(request,reg):
 
 @api_view(['POST'])
 def userAdd(request):
-    serialized=UserSerializer(data=request.data)
+    serialized=UserSerializerStore(data=request.data)
     bkNo=request.data['bookNo']
     book=Book.objects.filter(serial=bkNo)
     if book.exists():
@@ -102,7 +102,7 @@ def userAdd(request):
 def userUpdate(request,reg,ser):
     user=User.objects.filter(regNo=reg,bookNo=ser,returnStatus=False)
     if user.exists():
-        serialized=UserSerializer(instance=user,data=request.data)
+        serialized=UserSerializerStore(instance=user,data=request.data)
         if serialized.is_valid():
             serialized.save()
     else:    
@@ -110,12 +110,11 @@ def userUpdate(request,reg,ser):
     
 
 def userReturn(request,reg,ser,status):
-    book=User.objects.filter(regNo=reg,bookNo=ser,returnStatus=False)
-    if book.exists():
-        book.update(returnStatus=status)
-        return redirect("user-list")
-    else:
-        return Response("user not found!!")
+    book = get_object_or_404(klass=User,bookNo=ser,regNo=reg,returnStatus=False)
+    book.returnStatus=status
+    book.save()
+    return redirect("user-list")
+
 
 @api_view(['DELETE'])
 def userDelete(request,reg,ser):
