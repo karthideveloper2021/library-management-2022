@@ -11,6 +11,7 @@ urlpatterns=[
     path('book/<int:ser>/update/',views.bookUpdate),
     path('user/list/',views.userList,name="user-list"),
     path('user/<int:reg>/',views.userDetail),
+    path('user/<int:reg>/records/',views.userDetailRecords),
     path('user/add/',views.userAdd,name="user-add"),
     path('user/<int:reg>/delete/<int:ser>/',views.userDelete),
     path('user/<int:reg>/update/<int:ser>/',views.userUpdate),

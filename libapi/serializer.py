@@ -33,7 +33,7 @@ class BookSerializerStore(serializers.ModelSerializer):
 
 class UserSerializerStore(serializers.ModelSerializer):
     class Meta:
-        model=Book
+        model=User
         fields="__all__"
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,8 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def _bookname(self,user):
         ser=getattr(user,'bookNo')
-        book=Book.objects.filter(serial=ser)
-        bkName=book.values()[0]['Name']
+        book=Book.objects.get(serial=ser)
+        bkName=getattr(book,'Name')
         return bkName
     class Meta:
         model=User
