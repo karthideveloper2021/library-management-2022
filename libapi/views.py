@@ -1,6 +1,4 @@
-from django.http.response import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect,Http404
-from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializer import BookSerializer, BookSerializerStore,UserSerializer, UserSerializerStore
@@ -87,9 +85,12 @@ def userDetail(request,reg):
         
 @api_view(['GET'])
 def userDetailRecords(request,reg):
-    user=get_object_or_404(klass=User,regNo=reg)
-    serialized=UserSerializer(user,many=True)
-    return Response(serialized.data)
+    user=User.objects.filter(regNo=reg)
+    if user.exists():
+        serialized=UserSerializer(user,many=True)
+        return Response(serialized.data)
+    else:
+        return Response({"Detail":"User not found.."})
    
 
 @api_view(['POST'])
