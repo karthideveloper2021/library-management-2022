@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from .serializer import UserSerializer, UserSerializerStore
 from django.db.models import F
 from book.api.models import Book
-from .models import User,Settings
+from .models import User
+from dashboard.api.models import Settings
 from django.utils import timezone
 
 @api_view(['GET'])
@@ -18,6 +19,12 @@ def userList(request):
 @api_view(['GET'])
 def userDetail(request,reg):
     user=get_object_or_404(klass=User,regNo=reg,returnStatus=False)
+    serialized=UserSerializer(user,many=False)
+    return Response(serialized.data)
+
+@api_view(['GET'])
+def userDetailSpecific(request,reg,ser):
+    user=get_object_or_404(klass=User,regNo=reg,bookNo=ser,returnedStatus=False)
     serialized=UserSerializer(user,many=False)
     return Response(serialized.data)
         
@@ -33,11 +40,12 @@ def userDetailRecords(request,reg):
 
 @api_view(['POST'])
 def userAdd(request):
-    userAddData=request.data
+    userAddData=request.data.copy()
     returnPeriod=int(Settings.objects.get(setID=2201).value)
-    returnDate=timedelta(days=returnPeriod)+timezone.now()
-    returnDate.replace(hour=23,minute=59,second=59,microsecond=999999)
+    returnDate=timedelta(days=returnPeriod)+timezone.now().date()
+    returnDate=timezone.datetime.combine(returnDate,timezone.datetime.max.time())
     userAddData['returnDate']=returnDate
+    print(userAddData)
     serialized=UserSerializerStore(data=userAddData)
     bkNo=userAddData['bookNo']
     try:
@@ -52,47 +60,40 @@ def userAdd(request):
             serialized.save()
             book.no_of_times_borrowed=F('no_of_times_borrowed')+1
             book.save()
-        return redirect("user-list")
+        return Response({"Detail":"Book issued successfully.."})
 
 @api_view(['PUT'])
-def userUpdate(request,reg,ser):
+def userUpdate(request,userId):
     userData=request.data
-    user=get_object_or_404(klass=User,regNo=reg,bookNo=ser,
-                        returnStatus=False)
+    user=get_object_or_404(klass=User,id=userId)
     serialized=UserSerializerStore(instance=user,data=userData)
+
     if serialized.is_valid():
         serialized.save()
-    return Response({"Detail":"Updated successfuly.."})
+        return Response({"Detail":"Updated successfuly.."})
+    else:
+        print(serialized.data)
+        return Response({"Detail":"Error occured"})
     
 @api_view(['POST'])
-def userReturn(request,reg,ser,status):
-    user= get_object_or_404(klass=User,bookNo=ser,regNo=reg,returnStatus=False)
+def userReturn(request,userId,status):
+    user= get_object_or_404(klass=User,id=userId,returnStatus=False)
     if status==True:
         user.returnStatus=status
         user.save()
         return Response({"Detail":"Book returned successfully.."})
     elif status==False:
         returnPeriod=int(Settings.objects.get(setID=2201).value)
-        returnDate=timedelta(days=returnPeriod)+timezone.now()
-        returnDate.replace(hour=23,minute=59,second=59,microsecond=999999)
+        returnDate=timedelta(days=returnPeriod)+user.returnDate
+        returnDate=timezone.datetime.combine(returnDate,timezone.datetime.max.time())
         user.returnDate=returnDate
         user.save()
         return Response({"Detail":"Book renewed successfully"})
 
 
 @api_view(['DELETE'])
-def userDelete(request,reg,ser):
-    book=User.objects.filter(regNo=reg,bookNo=ser)
-    if book.exists():
-        book.delete()
-        return redirect("user-list")
-    else:
-        return Response({"Detail":"user not found!!"})
+def userDelete(request,pk):
+    user=get_object_or_404(klass=User,id=pk)
+    user.delete()
+    return Response({"Detail":"Deleted successfully..."})
 
-
-@api_view(['PUT'])
-def settingsParameters(request,code,val):
-    sett=get_object_or_404(klass=Settings,setID=code)
-    sett.value=val
-    sett.save()
-    return Response({"Detail":"Settings value changed successfully"})

@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect,Http404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializer import BookSerializer, BookSerializerStore
+from .serializer import BookSerializer, BookSerializerStore, BookSerializerUpdate
 from .models import Book
 
 @api_view(['GET'])
@@ -48,7 +48,8 @@ def bookDetail(request,ser):
 
 @api_view(['POST'])
 def bookCreate(request):
-    bookAddData=request.data
+    bookAddData=request.data.copy()
+    print(bookAddData)
     book=Book.objects.filter(serial=bookAddData['serial'])
     if not book.exists():
         serialized=BookSerializerStore(data=bookAddData)
@@ -67,7 +68,7 @@ def bookDelete(request,ser):
 @api_view(['PUT'])
 def bookUpdate(request,ser):
     book=get_object_or_404(klass=Book,serial=ser)
-    serialized=BookSerializerStore(instance=book,data=request.data)
+    serialized=BookSerializerUpdate(instance=book,data=request.data)
     if serialized.is_valid():
         serialized.save()
     return redirect("book-list")

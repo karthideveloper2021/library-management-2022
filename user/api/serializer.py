@@ -7,6 +7,7 @@ class UserSerializerStore(serializers.ModelSerializer):
             model=User
             fields="__all__"
 
+
 class UserSerializer(serializers.ModelSerializer):
     bookName=serializers.SerializerMethodField("_bookname")
 
@@ -17,6 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
         return bkName
     class Meta:
         model=User
-        fields=('Name','regNo','year','bookNo',
+        fields=('id','Name','regNo','year','bookNo',
         'bookName','borrowDate','returnDate','returnStatus')
 

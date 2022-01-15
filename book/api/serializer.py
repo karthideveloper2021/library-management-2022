@@ -31,3 +31,8 @@ class BookSerializerStore(serializers.ModelSerializer):
         model=Book
         fields="__all__"
 
+class BookSerializerUpdate(serializers.ModelSerializer):
+    class Meta:
+        model=Book
+        fields=['Name','author','date_of_pub','description',
+            'bookStock']
