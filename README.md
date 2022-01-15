@@ -8,7 +8,7 @@ This app contains two database model each have same CRUD functionality.
     model=Book
     model=User
 ```
-It also contain another model named [Settings]("library/settings.py") which is used to store some default value like user preference. In this case I used it to set book return period.
+It also contain another model named `Settings` which is used to store some default value like user preference. In this case I used it to set book return period.
 
 ## INITIAL SETUP
 
