@@ -24,4 +24,5 @@ urlpatterns = [
 
     path('api/book/',include('book.api.urls')),
     path('api/user/',include('user.api.urls')),
+    path('api/settings/',include('dashboard.api.urls'))
 ]

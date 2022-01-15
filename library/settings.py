@@ -83,10 +83,30 @@ WSGI_APPLICATION = 'library.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES={}
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default']=db_from_env
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+##hosting database
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
+
+###~~~~~~~~~~~~~~~~~~~~~~~~~~
+# For postregsql
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': '', #name of database
+#         'USER':'', #username
+#         'HOST':'', #host
+#         'PASSWORD': '' #password
+#     }
+# }
 
 
 # Password validation

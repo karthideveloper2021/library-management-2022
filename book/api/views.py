@@ -55,7 +55,7 @@ def bookCreate(request):
         serialized=BookSerializerStore(data=bookAddData)
         if serialized.is_valid():
             serialized.save()
-        return redirect('book-list')
+        return Response({"Detail":"Book added successfully..."})
     else:
         return Response({"Detail":"Another book exist with same serial number."},status=201)
 
@@ -63,7 +63,7 @@ def bookCreate(request):
 def bookDelete(request,ser):
     book=get_object_or_404(klass=Book,serial=ser)
     book.delete()
-    return redirect("book-list")
+    return Response({"Detail":"book deleted successfully.."})
 
 @api_view(['PUT'])
 def bookUpdate(request,ser):
@@ -71,5 +71,7 @@ def bookUpdate(request,ser):
     serialized=BookSerializerUpdate(instance=book,data=request.data)
     if serialized.is_valid():
         serialized.save()
-    return redirect("book-list")
+        return Response({"Detail":"book updated successfully.."})
+    else:
+        return Response({"Detail":"some error occured"})
     

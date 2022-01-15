@@ -18,9 +18,12 @@ def userList(request):
 
 @api_view(['GET'])
 def userDetail(request,reg):
-    user=get_object_or_404(klass=User,regNo=reg,returnStatus=False)
-    serialized=UserSerializer(user,many=False)
-    return Response(serialized.data)
+    user=User.objects.filter(regNo=reg,returnStatus=False)
+    if user.exists():
+        serialized=UserSerializer(user,many=True)
+        return Response(serialized.data)
+    else:
+        return Response({"Detail":"user not found"})
 
 @api_view(['GET'])
 def userDetailSpecific(request,reg,ser):
@@ -92,8 +95,8 @@ def userReturn(request,userId,status):
 
 
 @api_view(['DELETE'])
-def userDelete(request,pk):
-    user=get_object_or_404(klass=User,id=pk)
+def userDelete(request,userId):
+    user=get_object_or_404(klass=User,id=userId)
     user.delete()
     return Response({"Detail":"Deleted successfully..."})
 

@@ -2,5 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns=[    
-    path('settings/<int:code>&<int:val>/',views.settingsParameters)
+    path('init/',views.initial),
+    path('update/<int:code>/',views.update),
+    path('list/',views.list)
 ]
