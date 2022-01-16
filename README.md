@@ -12,6 +12,9 @@ It also contain another model named `Settings` which is used to store some defau
 
 ## INITIAL SETUP
 
+* Download python & install it from [python](https://python.org).
+    DJANGO supports python version 3.8, 3.9, and 3.10.
+
 * create a virtual environment and activate it.
 ```
 python -m venv virtual
@@ -56,7 +59,7 @@ DATABASES = {
 If you want to use other database like postgresql, then install the required packages and configure them in `library/settings.py`
 
 To use postgresql, you need to install the package which you may already installed as it is mentioned in `requirements.txt`.
-If not type this command in terminal
+If not type this command in terminal to install it.
 ```
 pip install psycopg2
 ```
@@ -82,6 +85,8 @@ To start the local server, type this & your are ready to test the api.
 > python manage.py runserver
 
 ## API
+
+>  You can use any software to test the api. I recommend you to use the `postman` software. Download & install it from [postman](https://www.postman.com/).
 
 First thing we have to set the default value for `book return period`, as already mentioned.
 > ### http://localhost/api/settings/init/
